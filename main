@@ -1,0 +1,68 @@
+import java.io.File
+
+val romanFont = File("C:\\Users\\SNA\\IdeaProjects\\ASCII Text Signature\\roman.txt").readLines(Charsets.US_ASCII)
+val mediumFont = File("C:\\Users\\SNA\\IdeaProjects\\ASCII Text Signature\\medium.txt").readLines(Charsets.US_ASCII)
+var charArray: Array<String> = Array(13) { "88" }
+var romanFonted: Array<String> = Array(10) { "" }
+var mediumFonted: Array<String> = Array(3) { "" }
+
+fun main() {
+    println("Enter name and surname:")
+  val name = readLine()!!
+  println("Enter person's status:")
+  val position = readLine()!!.toUpperCase()
+
+    var romanWidth = 0
+    for (ch in name) { romanWidth += pickRoman(ch) }
+    var mediumWidth = 0
+    for (ch in position) { mediumWidth += pickMedium(ch) }
+
+    val space1 = (maxOf(romanWidth, mediumWidth) - minOf(romanWidth, mediumWidth) + 4) / 2
+    val space2 = if ((maxOf(romanWidth, mediumWidth) - minOf(romanWidth, mediumWidth)) % 2 == 1) space1 + 1 else space1
+    if (romanWidth > mediumWidth) {
+        for (y in 0..9) { charArray[y] += "  " + romanFonted[y] + "  " + "88"}
+        for (y in 10..12) { charArray[y] += " ".repeat(space1) + mediumFonted[y-10] + " ".repeat(space2) + "88" }
+    } else {
+        for (y in 0..9) { charArray[y] += " ".repeat(space1) + romanFonted[y] + " ".repeat(space2) + "88"}
+        for (y in 10..12) { charArray[y] += "  " + mediumFonted[y-10] + "  " + "88" }
+    }
+
+    println("8".repeat(maxOf(romanWidth, mediumWidth) + 8))
+    for (y in 0..12) { println(charArray[y]) }
+    println("8".repeat(maxOf(romanWidth, mediumWidth) + 8))
+}
+
+fun pickRoman(ch: Char): Int {
+    return if (ch == ' ') { for (y in 0..9) { romanFonted[y] += "          " }; 10
+    } else {
+        var x = 0
+        romanFont.forEachIndexed { i, s ->
+            if (i in 1..562 step 11 && s.contains(ch)) {
+                var y = 0
+                while (y in 0..9) {
+                    romanFonted[y] += romanFont[i+1+y]
+                    y++
+                }
+                x = i
+            }
+        }
+        romanFont[x].split(" ").last().toInt()
+    }
+}
+fun pickMedium(ch: Char): Int {
+    return if (ch == ' ') { for (y in 0..2) { mediumFonted[y] += "     " }; 5
+    } else {
+        var x = 0
+        mediumFont.forEachIndexed { i, s ->
+            if (i in 1..205 step 4 && s.contains(ch)) {
+                var y = 0
+                while (y in 0..2) {
+                    mediumFonted[y] += mediumFont[i+1+y]
+                    y++
+                }
+                x = i
+            }
+        }
+        mediumFont[x].split(" ").last().toInt()
+    }
+}
